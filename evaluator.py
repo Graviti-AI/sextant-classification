@@ -3,11 +3,10 @@
 # Copyright 2022 Graviti. Licensed under MIT License.
 #
 
-import logging
 from typing import Any, Dict
-from collections import defaultdict
+
 InputJson = Dict[str, Any]
-logging.basicConfig(level=logging.INFO)
+
 """
 InputJson has the following format:
     {
@@ -26,8 +25,9 @@ InputJson has the following format:
 
 class Evaluator:
     """This class defines some calculate operations in evaluation tasks."""
+
     tp = 0
-    categories = defaultdict(int)
+    categories = {}
 
     def evaluate_one_data(
         self, input_ground_truths: InputJson, input_detections: InputJson
@@ -43,14 +43,20 @@ class Evaluator:
         Returns:
             A dict containing evaluation on one image and each category within it.
         """
-        logging.info(input_ground_truths)
-        logging.info(input_detections)
         category_truth = input_ground_truths["CLASSIFICATION"]["category"]
         category_detections = input_detections["CLASSIFICATION"]["category"]
         tp = int(category_truth == category_detections)
+
         self.tp += tp
-        self.categories[category_truth] += tp
-        return {"scope": 1, "overall": {"TP": tp}, "categories": {category_truth: {"TP": tp}}}
+        if category_truth not in self.categories:
+            self.categories[category_truth] = {"TP": tp}
+
+        self.categories[category_truth]["TP"] += tp
+        return {
+            "scope": 1,
+            "overall": {"TP": tp},
+            "categories": {category_truth: {"TP": tp}},
+        }
 
     def get_result(self):
         """Overall evaluation.
@@ -58,4 +64,8 @@ class Evaluator:
         Returns:
             A dict containing overall evaluation on all images and all categories.
         """
-        return {"scope": 0, "overall": {"TP": self.tp}, "categories": self.categories}
+        return {
+            "scope": 0,
+            "overall": {"TP": self.tp, "pr": {"x": [1, 0.5], "y": [1, 0.5]}},
+            "categories": self.categories,
+        }
