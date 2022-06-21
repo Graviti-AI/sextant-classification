@@ -3,9 +3,11 @@
 # Copyright 2022 Graviti. Licensed under MIT License.
 #
 
+import logging
 from typing import Any, Dict
 from collections import defaultdict
 InputJson = Dict[str, Any]
+logging.basicConfig(level=logging.INFO)
 """
 InputJson has the following format:
     {
@@ -41,6 +43,8 @@ class Evaluator:
         Returns:
             A dict containing evaluation on one image and each category within it.
         """
+        logging.info(input_ground_truths)
+        logging.info(input_detections)
         category_truth = input_ground_truths["CLASSIFICATION"]["category"]
         category_detections = input_detections["CLASSIFICATION"]["category"]
         tp = int(category_truth == category_detections)
