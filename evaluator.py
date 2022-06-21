@@ -22,7 +22,7 @@ InputJson has the following format:
 """
 
 
-class Evaluate:
+class Evaluator:
     """This class defines some calculate operations in evaluation tasks."""
     tp = 0
     categories = defaultdict(int)
@@ -46,7 +46,7 @@ class Evaluate:
         tp = int(category_truth == category_detections)
         self.tp += tp
         self.categories[category_truth] += tp
-        return {"scope": 1, "overall": {"TP": tp}, "categories": {category_truth: tp}}
+        return {"scope": 1, "overall": {"TP": tp}, "categories": {category_truth: {"TP": tp}}}
 
     def get_result(self):
         """Overall evaluation.
